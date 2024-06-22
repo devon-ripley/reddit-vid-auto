@@ -1,0 +1,1 @@
+C:\Users\derip\PycharmProjects\reddit_vid_auto\.venv\Scripts\python.exe reddit_vid_audo_GUI.py
