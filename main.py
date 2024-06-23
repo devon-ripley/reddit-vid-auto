@@ -193,14 +193,14 @@ class StoryGetter:
                     #if breaker:
                         #break
                     # add to sentence flags
-                    if no_add is False:
-                        self.sentence_break_flags[c][c2] = True
-                        first = line[:ind] + '.'
-                        last = line[ind:]
-                        self.stories[c]['text'][c2] = first
-                        self.stories[c]['text'].insert(c2 + 1, last)
-                else:
-                    self.sentence_break_flags[c][c2] = False
+                    #if no_add is False:
+                    #    self.sentence_break_flags[c][c2] = True
+                    #    first = line[:ind] + '.'
+                    #    last = line[ind:]
+                    #    self.stories[c]['text'][c2] = first
+                    #    self.stories[c]['text'].insert(c2 + 1, last)
+                #else:
+                    #self.sentence_break_flags[c][c2] = False
 
     def bad_char_removal(self):
         # * error
@@ -234,7 +234,7 @@ class StoryGetter:
 
     def text2speach(self):
         print('creating text to speach')
-        text_speech_handler.pytts_run(self.stories)
+        text_speech_handler.run_gtts(self.stories)
 
     def total_time(self):
         audio_duration = 0
