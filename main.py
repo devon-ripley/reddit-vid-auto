@@ -10,17 +10,15 @@
 import re
 import praw
 import config
-import torch
 from praw.models import MoreComments
-from TTS.api import TTS
 from pydub import AudioSegment
 import moviepy
 from moviepy.editor import *
 import pathlib
 import os
 import json
-from autocorrect import Speller
-
+import logging
+import text_speech_handler
 home_path = pathlib.Path().resolve()
 
 
@@ -175,40 +173,11 @@ class StoryGetter:
 
     def long_sentence_split(self):
         # 80max
-        print(self.stories)
         print('long sentence splitup')
         for c, story in enumerate(self.stories):
             self.sentence_break_flags.append([])
             for c2, line in enumerate(story['text']):
                 self.sentence_break_flags[c].append(False)
-                # * error
-                for c3, car in enumerate(line):
-                    print('scanning')
-                    if car == '*':
-                        starfirst = line[:c3]
-                        starlast = line[c3+1:]
-                        startotal = starfirst + starlast
-                        self.stories[c]['text'][c2] = startotal
-                        print('triggered')
-                        print(self.stories[c]['text'][c2])
-                        print('did it save?')
-                    if car == '\\':
-                        starfirst = line[:c3]
-                        starlast = line[c3 + 1:]
-                        startotal = starfirst + starlast
-                        self.stories[c]['text'][c2] = startotal
-                        print('triggered')
-                        print(self.stories[c]['text'][c2])
-                        print('did it save?')
-                    if car == r'\\':
-                        starfirst = line[:c3]
-                        starlast = line[c3 + 1:]
-                        startotal = starfirst + starlast
-                        self.stories[c]['text'][c2] = startotal
-                        print('triggered')
-                        print(self.stories[c]['text'][c2])
-                        print('did it save?')
-
                 if len(line) > 80:
                     no_add = False
                     ind = 80
@@ -233,20 +202,45 @@ class StoryGetter:
                 else:
                     self.sentence_break_flags[c][c2] = False
 
+    def bad_char_removal(self):
+        # * error
+        print('bad_char_removal')
+        for c, story in enumerate(self.stories):
+            for c2, line in enumerate(story['text']):
+                if c2 > 1:
+                    print(f"after: {story['text'][c2-1]}")
+                print(f'before: {line}')
+                for c3, char in enumerate(line):
+                    # 32-34, 46, 48-57, 63, 65-90
+                    ok_list = [32, 33, 34, 46, 63]
+                    ascii_value = ord(char)
+                    if len(line) == 1:
+                        self.stories[c]['text'].pop(c2)
+                    if ascii_value in ok_list:
+                        pass
+                    elif ascii_value in range(48, 58):
+                        pass
+                    elif ascii_value in range(65, 91):
+                        pass
+                    else:
+                        if c3 == 0:
+                            #cut = self.stories[c]['text'][c2][]
+                            pass
+                        else:
+                            first = self.stories[c]['text'][c2][:c3]
+                            last = self.stories[c]['text'][c2][c3+1:]
+                            total = first + last
+                            self.stories[c]['text'][c2] = total
+
     def text2speach(self):
         print('creating text to speach')
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        tts = TTS('tts_models/en/ljspeech/tacotron2-DDC_ph').to(device)
-        for c, story in enumerate(self.stories):
-            tts.tts_to_file(story['title'], file_path=f'data/audio/title_{story["sub"]}{c}.mp3')
-            #tts.tts_to_file(f'Story number {c + 1}', file_path=f'data/audio/story_card_{c}.mp3')
-            for c2, line in enumerate(story['text']):
-                tts.tts_to_file(line, file_path=f'data/audio/text_{story["sub"]}{c}_{c2}.mp3')
+        text_speech_handler.pytts_run(self.stories)
 
     def total_time(self):
         audio_duration = 0
         for c, story in enumerate(self.stories):
             text_list = story['text']
+            print(f'text list len: {len(text_list)}')
             sub = story['sub']
             for c2, line in enumerate(text_list):
                 audio_path = f'{home_path}/data/audio/text_{sub}{c}_{c2}.mp3'
@@ -379,6 +373,11 @@ class StoryGetter:
 
 def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comment_target, non_api=None):
     # get text from reddit, story or comment
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.INFO, handlers=[
+        logging.FileHandler("logs/debug.log"),
+        logging.StreamHandler()
+    ])
     story_obj = StoryGetter(grab, vid_path, vid_save_path, sub_id, story_target, vertical,
                             comment_target)
     #alt
@@ -391,6 +390,7 @@ def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comm
     story_obj.profanity_filter()
     story_obj.sentence_splitter()
     story_obj.long_sentence_split()
+    #story_obj.bad_char_removal()
     # create speach files
     story_obj.text2speach()
     story_obj.total_time()
