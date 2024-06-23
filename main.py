@@ -319,6 +319,7 @@ class StoryGetter:
                     txt_clip_list = [split_card]
             print('creating text and audio clips')
             for c2, line in enumerate(text_list):
+                print(f'Clip number: {c2}')
                 audio_path = f'{home_path}/data/audio/text_{sub}{c}_{c2}.mp3'
 
                 audio = AudioSegment.from_file(audio_path)

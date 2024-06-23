@@ -27,7 +27,7 @@ def pytts_run(stories):
 
 
 def run_gtts(stories):
-    slow = True
+    slow = False
     for c, story in enumerate(stories):
         tts = gTTS(text=story['title'], lang='en', slow=slow)
         tts.save(f'data/audio/title_{story["sub"]}{c}.mp3')
