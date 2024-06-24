@@ -19,6 +19,7 @@ import os
 import json
 import logging
 import text_speech_handler
+
 home_path = pathlib.Path().resolve()
 
 
@@ -51,11 +52,15 @@ class StoryGetter:
             print('error: story target does not match grab!')
             exit()
         if self.story_target:
-            target_list = config.target_story
+            if self.sub_id is not None:
+                target_list = [self.sub_id]
+            else:
+                target_list = config.target_story
             for sub_id in target_list:
                 submission = self.reddit.submission(sub_id)
                 subreddit = submission.subreddit
-                self.stories.append({'sub': subreddit, 'title': submission.title, 'text': submission.selftext})
+                self.stories.append(
+                    {'sub': subreddit, 'title': submission.title, 'text': submission.selftext, 'id': submission.id})
                 return
         if self.grab == 'story':
             print('gathering text from reddit, story')
@@ -67,7 +72,8 @@ class StoryGetter:
                     if submission.stickied:
                         continue
                     else:
-                        self.stories.append({'sub': subreddit, 'title': submission.title, 'text': submission.selftext})
+                        self.stories.append({'sub': subreddit, 'title': submission.title, 'text': submission.selftext,
+                                             'id': submission.id})
                         counter += 1
         else:
             print('gathering text from reddit, comments')
@@ -81,8 +87,15 @@ class StoryGetter:
                 if isinstance(top_level_comment, MoreComments):
                     continue
                 else:
-                    self.stories.append({'sub': self.sub_id, 'title': submission.title, 'text': top_level_comment.body})
+                    self.stories.append({'sub': self.sub_id, 'title': submission.title, 'text': top_level_comment.body,
+                                         'id': submission.id})
                     counter += 1
+
+    def save_story(self):
+        for c, story in enumerate(self.stories):
+            filepath = f"data/saved_stories/{self.stories[c]['sub']}_{self.stories[c]['id']}.json"
+            with open(filepath, "w") as outfile:
+                json.dump(self.stories[c], outfile)
 
     def non_api_story(self, filepath):
         print('getting non api json file')
@@ -190,8 +203,8 @@ class StoryGetter:
                             ind += 1
                         if ind == len(line) - 1:
                             break
-                    #if breaker:
-                        #break
+                    if breaker:
+                        break
                     # add to sentence flags
                     #if no_add is False:
                     #    self.sentence_break_flags[c][c2] = True
@@ -200,7 +213,7 @@ class StoryGetter:
                     #    self.stories[c]['text'][c2] = first
                     #    self.stories[c]['text'].insert(c2 + 1, last)
                 #else:
-                    #self.sentence_break_flags[c][c2] = False
+                #self.sentence_break_flags[c][c2] = False
 
     def bad_char_removal(self):
         # * error
@@ -208,7 +221,7 @@ class StoryGetter:
         for c, story in enumerate(self.stories):
             for c2, line in enumerate(story['text']):
                 if c2 > 1:
-                    print(f"after: {story['text'][c2-1]}")
+                    print(f"after: {story['text'][c2 - 1]}")
                 print(f'before: {line}')
                 for c3, char in enumerate(line):
                     # 32-34, 46, 48-57, 63, 65-90
@@ -228,7 +241,7 @@ class StoryGetter:
                             pass
                         else:
                             first = self.stories[c]['text'][c2][:c3]
-                            last = self.stories[c]['text'][c2][c3+1:]
+                            last = self.stories[c]['text'][c2][c3 + 1:]
                             total = first + last
                             self.stories[c]['text'][c2] = total
 
@@ -370,6 +383,13 @@ class StoryGetter:
         except:
             exit(1)
         os.system('del *')
+
+
+def save_story(grab, sub_id, story_target):
+    story_obj = StoryGetter(grab=grab, sub_id=sub_id, story_target=story_target)
+    story_obj.bot_login()
+    story_obj.bot_run()
+    story_obj.save_story()
 
 
 def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comment_target, non_api=None):
