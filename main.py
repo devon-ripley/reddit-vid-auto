@@ -255,19 +255,25 @@ class StoryGetter:
 
     def text2speach(self):
         print('creating text to speach')
-        text_speech_handler.run_gtts(self.stories)
+        text_speech_handler.run_ai_clone(self.stories)
 
     def total_time(self):
         audio_duration = 0
         for c, story in enumerate(self.stories):
             text_list = story['text']
             print(f'text list len: {len(text_list)}')
+            if True:
+                AudioSegment.from_wav(f'data/audio/title_{story["sub"]}{c}.wav').export(f'data/audio/title_{story["sub"]}{c}.mp3', format="mp3")
+                AudioSegment.from_wav(f'data/audio/story_card_{c}.wav').export(
+                    f'data/audio/story_card_{c}.mp3', format="mp3")
             sub = story['sub']
             for c2, line in enumerate(text_list):
+                if True:
+                    AudioSegment.from_wav(f'data/audio/text_{sub}{c}_{c2}.wav').export(f'data/audio/text_{sub}{c}_{c2}.mp3', format="mp3")
                 audio_path = f'{home_path}/data/audio/text_{sub}{c}_{c2}.mp3'
                 audio = AudioSegment.from_file(audio_path)
                 audio_duration += audio.duration_seconds
-        in_mins = audio_duration / 60 + (len(self.stories) * 12)
+        in_mins = (audio_duration + (len(self.stories) * 12)) / 60
         print(f'Total Source Video length needed{in_mins}')
 
     def title_clip_gen(self, sub, c, title, grab, vertical):
@@ -432,8 +438,8 @@ def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comm
 
 
 if __name__ == '__main__':
-    #vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None,
-    #         story_target=True, vertical=False, comment_target=False,
-    #         non_api=None)
-    save_story(grab='story', sub_id=None, story_target=True)
+    #vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None, story_target=True, vertical=False, comment_target=False, non_api=None)
+    vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None, story_target=True, vertical=False, comment_target=False, non_api='data/saved_stories/saved_test.json')
+    #save_story(grab='story', sub_id=None, story_target=True)
+    #text_speech_handler.tts_tortoise_setup()
     # 'C:\Users\derip\PycharmProjects\reddit_vid_auto\data\saved_stories\saved_test.json'
