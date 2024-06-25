@@ -60,7 +60,7 @@ class StoryGetter:
                 submission = self.reddit.submission(sub_id)
                 subreddit = submission.subreddit
                 self.stories.append(
-                    {'sub': subreddit, 'title': submission.title, 'text': submission.selftext, 'id': submission.id})
+                    {'sub': subreddit.display_name, 'title': submission.title, 'text': submission.selftext, 'id': submission.id})
                 return
         if self.grab == 'story':
             print('gathering text from reddit, story')
@@ -72,7 +72,7 @@ class StoryGetter:
                     if submission.stickied:
                         continue
                     else:
-                        self.stories.append({'sub': subreddit, 'title': submission.title, 'text': submission.selftext,
+                        self.stories.append({'sub': subreddit.display_name, 'title': submission.title, 'text': submission.selftext,
                                              'id': submission.id})
                         counter += 1
         else:
@@ -94,6 +94,7 @@ class StoryGetter:
     def save_story(self):
         for c, story in enumerate(self.stories):
             filepath = f"data/saved_stories/{self.stories[c]['sub']}_{self.stories[c]['id']}.json"
+            print(self.stories[c])
             with open(filepath, "w") as outfile:
                 json.dump(self.stories[c], outfile)
 
@@ -127,12 +128,13 @@ class StoryGetter:
             # parse title and text
             story_title = story['title']
             story_text = story['text']
+            story_id = story['id']
             for bad_word in word_dict.keys():
                 title = self.parse(bad_word, story_title)
                 text = self.parse(bad_word, story_text)
                 story_title = title
                 story_text = text
-            edited.append({'sub': story['sub'], 'title': story_title, 'text': story_text})
+            edited.append({'sub': story['sub'], 'title': story_title, 'text': story_text, 'id': story_id})
         self.stories = edited
 
     def sentence_splitter(self):
@@ -175,36 +177,42 @@ class StoryGetter:
         digits = "([0-9])"
         multiple_dots = r'\.{2,}'
 
-        new_list = []
-        for story in self.stories:
+        for c, story in enumerate(self.stories):
             new = split_into_sentences(story['text'])
-            new_story = story
-            new_story['text'] = new
-            new_list.append(new_story)
-
-        self.stories = new_list
+            self.stories[c]['text'] = new
 
     def long_sentence_split(self):
         # 80max
         print('long sentence splitup')
         for c, story in enumerate(self.stories):
             self.sentence_break_flags.append([])
-            for c2, line in enumerate(story['text']):
+            for c2, line in enumerate(self.stories[c]['text']):
                 self.sentence_break_flags[c].append(False)
                 if len(line) > 80:
                     no_add = False
                     ind = 80
                     breaker = False
-                    while breaker or line[ind] != ' ':
-                        if line[ind] == '.' or line[ind] == '?' or line[ind] == '!':
-                            no_add = True
-                            break
-                        if ind < len(line):
-                            ind += 1
-                        if ind == len(line) - 1:
-                            break
-                    if breaker:
-                        break
+                    for c3, char in enumerate(line):
+                        if c3 > 80:
+                            if char == ' ' or char == '.' or char == '?' or char == '!':
+                                # break sentence
+                                self.sentence_break_flags[c][c2] = True
+                                first = line[:ind] + '.'
+                                last = line[ind:]
+                                self.stories[c]['text'][c2] = first
+                                self.stories[c]['text'].insert(c2 + 1, last)
+                            else:
+                                break
+                    #while breaker or line[ind] != ' ':
+                    #    if line[ind] == '.' or line[ind] == '?' or line[ind] == '!':
+                    #        no_add = True
+                    #        break
+                    #    if ind < len(line):
+                    #        ind += 1
+                    #    if ind == len(line) - 1:
+                    #        break
+                    #if breaker:
+                    #    break
                     # add to sentence flags
                     #if no_add is False:
                     #    self.sentence_break_flags[c][c2] = True
@@ -389,6 +397,9 @@ def save_story(grab, sub_id, story_target):
     story_obj = StoryGetter(grab=grab, sub_id=sub_id, story_target=story_target)
     story_obj.bot_login()
     story_obj.bot_run()
+    story_obj.profanity_filter()
+    story_obj.sentence_splitter()
+    story_obj.long_sentence_split()
     story_obj.save_story()
 
 
@@ -421,7 +432,8 @@ def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comm
 
 
 if __name__ == '__main__':
-    vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None,
-             story_target=True, vertical=False, comment_target=False,
-             non_api=None)
+    #vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None,
+    #         story_target=True, vertical=False, comment_target=False,
+    #         non_api=None)
+    save_story(grab='story', sub_id=None, story_target=True)
     # 'C:\Users\derip\PycharmProjects\reddit_vid_auto\data\saved_stories\saved_test.json'
