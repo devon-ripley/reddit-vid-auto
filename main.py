@@ -53,15 +53,17 @@ class StoryGetter:
             exit()
         if self.story_target:
             if self.sub_id is not None:
+                print('sub_id is not none')
                 target_list = [self.sub_id]
             else:
                 target_list = config.target_story
             for sub_id in target_list:
+                print('go')
                 submission = self.reddit.submission(sub_id)
                 subreddit = submission.subreddit
                 self.stories.append(
                     {'sub': subreddit.display_name, 'title': submission.title, 'text': submission.selftext, 'id': submission.id})
-                return
+            return
         if self.grab == 'story':
             print('gathering text from reddit, story')
             for subreddit in config.sub_reddits:
@@ -255,7 +257,7 @@ class StoryGetter:
 
     def text2speach(self):
         print('creating text to speach')
-        text_speech_handler.run_pytts(self.stories)
+        text_speech_handler.run_gtts(self.stories)
 
     def total_time(self):
         audio_duration = 0
