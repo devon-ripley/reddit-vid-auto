@@ -255,20 +255,21 @@ class StoryGetter:
 
     def text2speach(self):
         print('creating text to speach')
-        text_speech_handler.run_ai_clone(self.stories)
+        text_speech_handler.run_pytts(self.stories)
 
     def total_time(self):
         audio_duration = 0
+        ai_voice_clone = False
         for c, story in enumerate(self.stories):
             text_list = story['text']
             print(f'text list len: {len(text_list)}')
-            if True:
+            if ai_voice_clone:
                 AudioSegment.from_wav(f'data/audio/title_{story["sub"]}{c}.wav').export(f'data/audio/title_{story["sub"]}{c}.mp3', format="mp3")
                 AudioSegment.from_wav(f'data/audio/story_card_{c}.wav').export(
                     f'data/audio/story_card_{c}.mp3', format="mp3")
             sub = story['sub']
             for c2, line in enumerate(text_list):
-                if True:
+                if ai_voice_clone:
                     AudioSegment.from_wav(f'data/audio/text_{sub}{c}_{c2}.wav').export(f'data/audio/text_{sub}{c}_{c2}.mp3', format="mp3")
                 audio_path = f'{home_path}/data/audio/text_{sub}{c}_{c2}.mp3'
                 audio = AudioSegment.from_file(audio_path)

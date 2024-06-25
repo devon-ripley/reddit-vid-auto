@@ -77,12 +77,12 @@ def run_gtts(stories):
 
 
 def run_ai_clone(stories):
-    os.chdir('ai_voice_cloning')
-    os.system('start start.bat')
-    time.sleep(15)
+    #os.chdir('ai_voice_cloning')
+    #os.system('start start.bat')
+    #time.sleep(15)
     current_path = os.path.abspath(os.getcwd())
-    samples = 256
-    iterations = 200
+    samples = 25
+    iterations = 50
     # run start.bat for ai_voice_cloning
     client = Client("http://127.0.0.1:7860/")
     voice = "jane_eyre"

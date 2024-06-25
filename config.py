@@ -9,7 +9,7 @@ sub_reddits = ['relationship_advice']
 # comment vars
 number_of_comments = 1
 
-target_story = ['198v7lb']
+target_story = ['1dnt7ar', '1dnu3y3', '1dnkv2i']
 
 
 #vid vars
