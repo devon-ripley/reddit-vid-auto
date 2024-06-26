@@ -197,14 +197,16 @@ class StoryGetter:
                     for c3, char in enumerate(line):
                         if c3 > 80:
                             if char == ' ' or char == '.' or char == '?' or char == '!':
+                                print(f'activate {char}')
                                 # break sentence
                                 self.sentence_break_flags[c][c2] = True
-                                first = line[:ind] + '.'
-                                last = line[ind:]
+                                first = line[:c3] + '.'
+                                last = line[c3:]
                                 self.stories[c]['text'][c2] = first
                                 self.stories[c]['text'].insert(c2 + 1, last)
-                            else:
                                 break
+        print(self.stories)
+        input()
                     #while breaker or line[ind] != ' ':
                     #    if line[ind] == '.' or line[ind] == '?' or line[ind] == '!':
                     #        no_add = True
@@ -442,7 +444,7 @@ def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comm
 
 if __name__ == '__main__':
     #vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None, story_target=True, vertical=False, comment_target=False, non_api=None)
-    vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None, story_target=True, vertical=False, comment_target=False, non_api='data/saved_stories/saved_test.json')
+    vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None, story_target=True, vertical=False, comment_target=False, non_api='data/saved_stories/long_sentence_test.json')
     #save_story(grab='story', sub_id=None, story_target=True)
     #text_speech_handler.tts_tortoise_setup()
     # 'C:\Users\derip\PycharmProjects\reddit_vid_auto\data\saved_stories\saved_test.json'
