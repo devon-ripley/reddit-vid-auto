@@ -5,8 +5,7 @@
 # ?add logging? lmao
 # thumbnail creation on side?
 # auto youtube upload???
-
-
+import datetime
 import re
 import praw
 import config
@@ -94,11 +93,12 @@ class StoryGetter:
                     counter += 1
 
     def save_story(self):
-        for c, story in enumerate(self.stories):
-            filepath = f"data/saved_stories/{self.stories[c]['sub']}_{self.stories[c]['id']}.json"
-            print(self.stories[c])
-            with open(filepath, "w") as outfile:
-                json.dump(self.stories[c], outfile)
+        current = datetime.datetime.now()
+        dt = current.strftime("%d_%m_%y_%H_%M_%S")
+        filepath = f"data/saved_stories/{dt}.json"
+        print(self.stories)
+        with open(filepath, "w") as outfile:
+            json.dump(self.stories, outfile)
 
     def non_api_story(self, filepath):
         print('getting non api json file')
@@ -125,6 +125,7 @@ class StoryGetter:
     def profanity_filter(self):
         print('filtering profanity')
         word_dict = config.bad_words
+        word_dict = {'t': 't'}
         edited = []
         for story in self.stories:
             # parse title and text
@@ -190,6 +191,8 @@ class StoryGetter:
             self.sentence_break_flags.append([])
             for c2, line in enumerate(self.stories[c]['text']):
                 self.sentence_break_flags[c].append(False)
+                if len(line) == 1:
+                    del self.stories[c]['text'][c2]
                 if len(line) > 80:
                     no_add = False
                     ind = 80
@@ -206,7 +209,6 @@ class StoryGetter:
                                 self.stories[c]['text'].insert(c2 + 1, last)
                                 break
         print(self.stories)
-        input()
                     #while breaker or line[ind] != ' ':
                     #    if line[ind] == '.' or line[ind] == '?' or line[ind] == '!':
                     #        no_add = True
@@ -444,7 +446,7 @@ def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comm
 
 if __name__ == '__main__':
     #vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None, story_target=True, vertical=False, comment_target=False, non_api=None)
-    vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None, story_target=True, vertical=False, comment_target=False, non_api='data/saved_stories/long_sentence_test.json')
-    #save_story(grab='story', sub_id=None, story_target=True)
+    #vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None, story_target=True, vertical=False, comment_target=False, non_api='data/saved_stories/long_sentence_test.json')
+    save_story(grab='story', sub_id=None, story_target=True)
     #text_speech_handler.tts_tortoise_setup()
     # 'C:\Users\derip\PycharmProjects\reddit_vid_auto\data\saved_stories\saved_test.json'
