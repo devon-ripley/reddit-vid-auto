@@ -94,18 +94,18 @@ class StoryGetter:
 
     def save_story(self):
         current = datetime.datetime.now()
-        dt = current.strftime("%d_%m_%y_%H_%M_%S")
-        filepath = f"data/saved_stories/{dt}.json"
+        dt = current.strftime("%d_%m_%y")
+        filepath = f"data/saved_stories/{dt}_{self.stories[0]['sub']}.json"
         print(self.stories)
         with open(filepath, "w") as outfile:
-            json.dump(self.stories, outfile)
+            json.dump(self.stories, outfile, indent=3)
 
     def non_api_story(self, filepath):
         print('getting non api json file')
         # get stories from file in data, json
         with open(filepath) as json_file:
             data = json.load(json_file)
-        data = data["data"]
+        print(data)
         self.stories = data
 
     def parse(self, bad_word, text):
@@ -405,12 +405,11 @@ class StoryGetter:
             exit(1)
         os.system('del *')
 
-
 def save_story(grab, sub_id, story_target):
     story_obj = StoryGetter(grab=grab, sub_id=sub_id, story_target=story_target)
     story_obj.bot_login()
     story_obj.bot_run()
-    story_obj.profanity_filter()
+    #story_obj.profanity_filter()
     story_obj.sentence_splitter()
     story_obj.long_sentence_split()
     story_obj.save_story()
@@ -428,11 +427,18 @@ def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comm
     #alt
     if non_api is not None:
         story_obj.non_api_story(non_api)
+        # create speach files
+        story_obj.text2speach()
+        story_obj.total_time()
+        # create and save video
+        story_obj.video_modification()
+        # story_obj.cleanup()
+        exit()
     else:
         story_obj.bot_login()
         story_obj.bot_run()
     # text manipulation
-    story_obj.profanity_filter()
+    #story_obj.profanity_filter()
     story_obj.sentence_splitter()
     story_obj.long_sentence_split()
     #story_obj.bad_char_removal()
@@ -446,7 +452,7 @@ def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comm
 
 if __name__ == '__main__':
     #vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None, story_target=True, vertical=False, comment_target=False, non_api=None)
-    #vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None, story_target=True, vertical=False, comment_target=False, non_api='data/saved_stories/long_sentence_test.json')
-    save_story(grab='story', sub_id=None, story_target=True)
+    vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/vertical_vid_test.mp4', sub_id=None, story_target=False, vertical=True, comment_target=False, non_api='data/saved_stories/27_06_24_tifu.json')
+    #save_story(grab='story', sub_id=None, story_target=True)
     #text_speech_handler.tts_tortoise_setup()
     # 'C:\Users\derip\PycharmProjects\reddit_vid_auto\data\saved_stories\saved_test.json'
