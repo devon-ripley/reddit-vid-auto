@@ -2,3 +2,5 @@
 /output/
 /ffmpeg/
 /data/
+config.json
+test_ground.py
