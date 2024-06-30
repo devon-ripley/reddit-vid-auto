@@ -1,11 +1,5 @@
-# TODO:
-# add more subs, is hot past 24 hrs
-# target comment?
-# ?add logging? lmao
-# thumbnail creation on side?
-# auto youtube upload???
-# add auto directory creation
-# add auto config.json setup
+# TODO: target comment, add logging lmao, auto config.json setup, thumbnail creation on side?
+
 import datetime
 import re
 import praw
@@ -30,7 +24,7 @@ config.client_id = data["client_id"]
 config.client_secret = data["client_secret"]
 config.user_agent = data["user_agent"]
 
-# story vars auto load
+# story vars autoload
 config.number_of_posts = data["number_of_posts"]
 config.sub_reddits = data["sub_reddits"]
 
