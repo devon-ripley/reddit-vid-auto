@@ -23,7 +23,6 @@ class StoryGetter:
     def __init__(self, grab='story', vid_path='test.mp4', vid_save_path='untitled.mp4', sub_id=None, story_target=False,
                  vertical=False, comment_target=False):
         self.stories = []
-        self.reddit = 0
         self.grab = grab
         self.vid_path = vid_path
         self.vid_save_path = vid_save_path
@@ -40,9 +39,9 @@ class StoryGetter:
             client_secret=config.client_secret,
             user_agent=config.user_agent
         )
-        self.reddit = reddit_login
+        return reddit_login
 
-    def bot_run(self):
+    def bot_run(self, reddit):
         # error handling
         if self.story_target is True and self.grab != 'story':
             print('error: story target does not match grab!')
@@ -55,7 +54,7 @@ class StoryGetter:
                 target_list = config.target_story
             for sub_id in target_list:
                 print('go')
-                submission = self.reddit.submission(sub_id)
+                submission = reddit.submission(sub_id)
                 subreddit = submission.subreddit
                 self.stories.append(
                     {'sub': subreddit.display_name, 'title': submission.title, 'text': submission.selftext,
@@ -65,7 +64,7 @@ class StoryGetter:
             print('gathering text from reddit, story')
             for subreddit in config.sub_reddits:
                 counter = 0
-                for submission in self.reddit.subreddit(subreddit).hot(limit=10):
+                for submission in reddit.subreddit(subreddit).hot(limit=10):
                     if counter == config.number_of_posts:
                         break
                     if submission.stickied:
@@ -77,7 +76,7 @@ class StoryGetter:
                         counter += 1
         else:
             print('gathering text from reddit, comments')
-            submission = self.reddit.submission(self.sub_id)
+            submission = reddit.submission(self.sub_id)
             counter = 0
             for top_level_comment in submission.comments:
                 if counter >= config.number_of_comments:
@@ -132,8 +131,8 @@ class StoryGetter:
             story_text = story['text']
             story_id = story['id']
             for bad_word in word_dict.keys():
-                title = self.parse(bad_word, story_title, config)
-                text = self.parse(bad_word, story_text, config)
+                title = self.parse(bad_word, story_title)
+                text = self.parse(bad_word, story_text)
                 story_title = title
                 story_text = text
             edited.append({'sub': story['sub'], 'title': story_title, 'text': story_text, 'id': story_id})
@@ -292,7 +291,7 @@ class StoryGetter:
         in_mins = (audio_duration + (len(self.stories) * 12)) / 60
         print(f'Total Source Video length needed{in_mins}')
 
-    def title_clip_gen(self, sub, c, title, grab, vertical, config):
+    def title_clip_gen(self, sub, c, title, grab, vertical):
         if vertical:
             split_card = TextClip(txt=f'{config.story_delim}{c + 1}', fontsize=config.text_size,
                                   color=config.text_color,
@@ -424,8 +423,8 @@ class StoryGetter:
 
 def save_story(grab, sub_id, story_target):
     story_obj = StoryGetter(grab=grab, sub_id=sub_id, story_target=story_target)
-    story_obj.bot_login()
-    story_obj.bot_run()
+    reddit = story_obj.bot_login()
+    story_obj.bot_run(reddit)
     #story_obj.profanity_filter()
     story_obj.sentence_splitter()
     story_obj.long_sentence_split()
@@ -452,8 +451,8 @@ def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comm
         # story_obj.cleanup()
         exit()
     else:
-        story_obj.bot_login()
-        story_obj.bot_run()
+        reddit = story_obj.bot_login()
+        story_obj.bot_run(reddit)
     # text manipulation
     #story_obj.profanity_filter()
     story_obj.sentence_splitter()
