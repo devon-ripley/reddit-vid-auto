@@ -17,39 +17,7 @@ import text_speech_handler
 home_path = pathlib.Path().resolve()
 
 # load config
-with open('config.json') as json_file:
-    data = json.load(json_file)
-config = base_config.Config()
-config.client_id = data["client_id"]
-config.client_secret = data["client_secret"]
-config.user_agent = data["user_agent"]
-
-# story vars autoload
-config.number_of_posts = data["number_of_posts"]
-config.sub_reddits = data["sub_reddits"]
-
-# comment vars
-config.number_of_comments = data["number_of_comments"]
-config.story_delim_audio = data["story_delim_audio"]
-config.story_delim = data["story_delim"]
-config.target_story = data["target_story"]
-
-# vid vars
-config.start_delay = data["start_delay"]
-config.fps = data["fps"]
-config.resolution = data["resolution"]
-config.resolution_back = data["resolution_back"]
-config.vertical_resolution = data["vertical_resolution"]
-config.vertical_resolution_back = data["vertical_resolution_back"]
-config.font = data["font"]
-# Trebuchet-MS-Bold, Segoe-UI-Semibold 'to wide' , Arial-black is great, a little sharp
-config.text_size = data["text_size"]
-config.text_color = data["text_color"]
-config.stroke_color = data["stroke_color"]
-config.stroke_size = data["stroke_size"]
-config.align = data["align"]
-config.tts_to_use = data["tts_to_use"]
-
+config = base_config.setup()
 
 class StoryGetter:
     def __init__(self, grab='story', vid_path='test.mp4', vid_save_path='untitled.mp4', sub_id=None, story_target=False,
