@@ -1,0 +1,9 @@
+praw~=7.7.1
+moviepy~=1.0.3
+pydub~=0.25.1
+gradio~=4.36.1
+torch~=2.3.1+cu118
+TTS~=0.22.0
+gradio_client~=1.0.1
+pyttsx3~=2.90
+gtts~=2.5.1
