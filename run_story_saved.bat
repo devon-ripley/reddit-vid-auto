@@ -1,1 +1,0 @@
-C:\Users\derip\PycharmProjects\reddit_vid_auto\.venv\Scripts\python.exe reddit_vid_auto.py story -n data/saved_stories/saved_test.json -p input_vid/big_test.mp4 -s output/fancy_test.mp4

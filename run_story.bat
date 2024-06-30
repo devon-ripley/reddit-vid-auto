@@ -1,1 +1,0 @@
-C:\Users\derip\PycharmProjects\reddit_vid_auto\.venv\Scripts\python.exe reddit_vid_auto.py story -p input_vid/big_test.mp4 -s first_vid.mp4 -t

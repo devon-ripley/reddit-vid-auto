@@ -1,1 +1,0 @@
-C:\Users\derip\PycharmProjects\reddit_vid_auto\.venv\Scripts\python.exe reddit_vid_auto.py comment -p test.mp4 -s final_test.mp4 -i 1dibg9s
