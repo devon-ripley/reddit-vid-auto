@@ -28,6 +28,7 @@ def run_tts(stories):
 #    output_dict = model.synthesize('test', config, speaker_id="random", extra_voice_dirs=None)
 
 def run_tts_tortoise(stories):
+    #does not work yet
     tts = TTS("tts_models/en/multi-dataset/tortoise-v2")
     voice_dir = "models/voices/"
     speaker = "lj"
@@ -80,6 +81,9 @@ def run_ai_clone(stories):
     #os.chdir('ai_voice_cloning')
     #os.system('start start.bat')
     #time.sleep(15)
+    # will it work when reddit vid gui is running??
+    # only works with ai_voice_clone, very slow
+    # https://github.com/JarodMica/ai-voice-cloning
     current_path = os.path.abspath(os.getcwd())
     samples = 25
     iterations = 50
@@ -186,87 +190,3 @@ def run_ai_clone(stories):
             os.system(f'copy {current_path}\\ai_voice_cloning\\results\\jane_eyre\\{result[2]["choices"][0][0][22:]} {current_path}\\data\\audio\\text_{story["sub"]}{c}_{c2}.wav')
             #saveit!!
     client.close()
-
-def run_ai_clone_2(stories):
-    import ai_voice_cloning.src.utils as ai_voice
-    for c, story in enumerate(stories):
-        kwargs = {
-            'text': story['title'],
-            'delimiter': "\n",
-            'emotion': "happy",
-            'prompt': "i am happy",
-            'voice': "jane_eyre",
-            'mic_audio': None,
-            'voice_latents_chunks': 3,
-            'candidates': 1,
-            'seed': 3,
-            'num_autoregressive_samples': 16,
-            'diffusion_iterations': 30,
-            'temperature': 0.2,
-            'diffusion_sampler': "DDIM",
-            'breathing_room': 8,
-            'cvvp_weight': 0,
-            'top_p': 0.8,
-            'diffusion_temperature': 1,
-            'length_penalty': 1,
-            'repetition_penalty': 2,
-            'cond_free_k': 2,
-            'experimentals': "Conditioning-Free",
-            'filepath': f'data/audio/title_{story["sub"]}{c}.wav'
-        }
-        ai_voice.generate_tortoise(kwargs)
-
-        kwargs = {
-            'text': f'Story number {c + 1}',
-            'delimiter': "\n",
-            'emotion': "happy",
-            'prompt': "i am happy",
-            'voice': "jane_eyre",
-            'mic_audio': None,
-            'voice_latents_chunks': 3,
-            'candidates': 1,
-            'seed': 3,
-            'num_autoregressive_samples': 16,
-            'diffusion_iterations': 30,
-            'temperature': 0.2,
-            'diffusion_sampler': "DDIM",
-            'breathing_room': 8,
-            'cvvp_weight': 0,
-            'top_p': 0.8,
-            'diffusion_temperature': 1,
-            'length_penalty': 1,
-            'repetition_penalty': 2,
-            'cond_free_k': 2,
-            'experimentals': "Conditioning-Free",
-            'filepath': f'data/audio/story_card_{c}.wav'
-        }
-        ai_voice.generate_tortoise(kwargs)
-
-        for c2, line in enumerate(story['text']):
-            print(f'Line: {line}')
-
-            kwargs = {
-                'text': line,
-                'delimiter': "\n",
-                'emotion': "happy",
-                'prompt': "i am happy",
-                'voice': "jane_eyre",
-                'mic_audio': None,
-                'voice_latents_chunks': 3,
-                'candidates': 1,
-                'seed': 3,
-                'num_autoregressive_samples': 16,
-                'diffusion_iterations': 30,
-                'temperature': 0.2,
-                'diffusion_sampler': "DDIM",
-                'breathing_room': 8,
-                'cvvp_weight': 0,
-                'top_p': 0.8,
-                'diffusion_temperature': 1,
-                'length_penalty': 1,
-                'repetition_penalty': 2,
-                'cond_free_k': 2,
-                'experimentals': "Conditioning-Free",
-                'filepath': f'data/audio/text_{story["sub"]}{c}_{c2}.wav'
-            }
-            ai_voice.generate_tortoise(kwargs)

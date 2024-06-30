@@ -29,6 +29,7 @@ class Config:
         self.stroke_color = 'black'
         self.stroke_size = 3.5
         self.align = 'center'
+        self.tts_to_use = "gtts"
 
         # bad word list
         self.bad_words = {'SEXUAL': 'FUN TIME', 'LINGERIE': 'FUN CLOTHES', 'ANAL': 'BUTT STUFF', 'ANUS': 'BUTT',

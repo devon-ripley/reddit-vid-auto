@@ -1,10 +1,11 @@
 # TODO:
-#long sentance split is breaking words in half now. fixed end of sentence bug. weird invisibal chars messing it up. by *. check for non alpha askii??
 # add more subs, is hot past 24 hrs
 # target comment?
 # ?add logging? lmao
 # thumbnail creation on side?
 # auto youtube upload???
+# add auto directory creation
+# add auto config.json setup
 import datetime
 import re
 import praw
@@ -53,6 +54,7 @@ config.text_color = data["text_color"]
 config.stroke_color = data["stroke_color"]
 config.stroke_size = data["stroke_size"]
 config.align = data["align"]
+config.tts_to_use = data["tts_to_use"]
 
 
 class StoryGetter:
@@ -143,7 +145,7 @@ class StoryGetter:
         print(data)
         self.stories = data
 
-    def parse(self, bad_word, text, config):
+    def parse(self, bad_word, text):
         text = text.upper()
         check = True
         while check:
@@ -296,7 +298,15 @@ class StoryGetter:
 
     def text2speach(self):
         print('creating text to speach')
-        text_speech_handler.run_gtts(self.stories)
+        match config.tts_to_use:
+            case "gtts":
+                text_speech_handler.run_gtts(self.stories)
+            case "tts":
+                text_speech_handler.run_tts(self.stories)
+            case "pytts":
+                text_speech_handler.run_pytts(self.stories)
+            case "ai_clone":
+                text_speech_handler.run_ai_clone(self.stories)
 
     def total_time(self):
         audio_duration = 0
