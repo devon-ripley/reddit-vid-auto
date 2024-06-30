@@ -83,7 +83,7 @@ def config_edit(client_id, client_secret, user_agent, number_of_posts, sub_reddi
 def run_vid_auto(grab, vid_path, vid_save_path, story_target, vertical, comment_target, sub_id,
                  non_api):
     import main
-    main.vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comment_target, non_api, config)
+    main.vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comment_target, non_api)
     return f"Video saved {vid_save_path}"
 
 
@@ -91,7 +91,7 @@ run_main = gr.Interface(
     fn=run_vid_auto,
     inputs=[
         gr.Dropdown(["story", "comment"], label="Video type"),
-        gr.Textbox(label="Input video path", value="input_vid/", info="Must be .mp4"),
+        gr.Textbox(label="Input video path", value="input_videos/", info="Must be .mp4"),
         gr.Textbox(label="Output video path", value="output/", info="Must be .mp4"),
         gr.Checkbox(label="target story",
                     info="uses story targets from config, if checked sub id and non api must be blank"),
