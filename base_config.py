@@ -1,8 +1,8 @@
 class Config:
     def __init__(self):
-        self.client_id = 'DHupAur7ts_ABo0EyfSUjg'
-        self.client_secret = 'qTWXw0h1_bG8Rfu3lmefTxmxRznk6A'
-        self.user_agent = 'driperfars reader'
+        self.client_id = 'ggffsssjjj'
+        self.client_secret = 'jjjjhhhhhggg555'
+        self.user_agent = 'reader'
 
         #story vars auto load
         self.number_of_posts = 1
