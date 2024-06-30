@@ -1,13 +1,13 @@
 import os
 import time
-
+import base_config
 import torch
 from TTS.api import TTS
 import pyttsx3
 from gtts import gTTS
 from gradio_client import Client
 
-
+config = base_config.Config()
 
 def run_tts(stories):
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -38,7 +38,7 @@ def run_tts_tortoise(stories):
                         voice_dir=voice_dir,
                         speaker=speaker,
                         preset=preset)
-        tts.tts_to_file(text=f'Story number {c + 1}',
+        tts.tts_to_file(text=f'{config.story_delim_audio}{c + 1}',
                         file_path=f'data/audio/story_card_{c}.mp3',
                         voice_dir=voice_dir,
                         speaker=speaker,
@@ -56,7 +56,7 @@ def run_pytts(stories):
     for c, story in enumerate(stories):
         engine.save_to_file(story['title'], f'data/audio/title_{story["sub"]}{c}.mp3')
         engine.runAndWait()
-        engine.save_to_file(f'Story number {c + 1}', f'data/audio/story_card_{c}.mp3')
+        engine.save_to_file(f'{config.story_delim_audio}{c + 1}', f'data/audio/story_card_{c}.mp3')
         engine.runAndWait()
         for c2, line in enumerate(story['text']):
             engine.save_to_file(line, f'data/audio/text_{story["sub"]}{c}_{c2}.mp3')
@@ -68,7 +68,7 @@ def run_gtts(stories):
     for c, story in enumerate(stories):
         tts = gTTS(text=story['title'], lang='en', slow=slow)
         tts.save(f'data/audio/title_{story["sub"]}{c}.mp3')
-        tts = gTTS(text=f'Story number {c + 1}', lang='en', slow=slow)
+        tts = gTTS(text=f'{config.story_delim_audio}{c + 1}', lang='en', slow=slow)
         tts.save(f'data/audio/story_card_{c}.mp3')
         for c2, line in enumerate(story['text']):
             print(f'Line: {line}')
@@ -122,7 +122,7 @@ def run_ai_clone(stories):
         #tts.save(f'data/audio/title_{story["sub"]}{c}.mp3')
 
         result = client.predict(
-            f'Story number {c + 1}',
+            f'{config.story_delim_audio}{c + 1}',
             "\n",
             "Happy",
             "I am happy",

@@ -8,7 +8,7 @@
 import datetime
 import re
 import praw
-import config
+import base_config
 from praw.models import MoreComments
 from pydub import AudioSegment
 import moviepy
@@ -20,6 +20,39 @@ import logging
 import text_speech_handler
 
 home_path = pathlib.Path().resolve()
+
+# load config
+with open('config.json') as json_file:
+    data = json.load(json_file)
+config = base_config.Config()
+config.client_id = data["client_id"]
+config.client_secret = data["client_secret"]
+config.user_agent = data["user_agent"]
+
+# story vars auto load
+config.number_of_posts = data["number_of_posts"]
+config.sub_reddits = data["sub_reddits"]
+
+# comment vars
+config.number_of_comments = data["number_of_comments"]
+config.story_delim_audio = data["story_delim_audio"]
+config.story_delim = data["story_delim"]
+config.target_story = data["target_story"]
+
+# vid vars
+config.start_delay = data["start_delay"]
+config.fps = data["fps"]
+config.resolution = data["resolution"]
+config.resolution_back = data["resolution_back"]
+config.vertical_resolution = data["vertical_resolution"]
+config.vertical_resolution_back = data["vertical_resolution_back"]
+config.font = data["font"]
+# Trebuchet-MS-Bold, Segoe-UI-Semibold 'to wide' , Arial-black is great, a little sharp
+config.text_size = data["text_size"]
+config.text_color = data["text_color"]
+config.stroke_color = data["stroke_color"]
+config.stroke_size = data["stroke_size"]
+config.align = data["align"]
 
 
 class StoryGetter:
@@ -61,7 +94,8 @@ class StoryGetter:
                 submission = self.reddit.submission(sub_id)
                 subreddit = submission.subreddit
                 self.stories.append(
-                    {'sub': subreddit.display_name, 'title': submission.title, 'text': submission.selftext, 'id': submission.id})
+                    {'sub': subreddit.display_name, 'title': submission.title, 'text': submission.selftext,
+                     'id': submission.id})
             return
         if self.grab == 'story':
             print('gathering text from reddit, story')
@@ -73,8 +107,9 @@ class StoryGetter:
                     if submission.stickied:
                         continue
                     else:
-                        self.stories.append({'sub': subreddit.display_name, 'title': submission.title, 'text': submission.selftext,
-                                             'id': submission.id})
+                        self.stories.append(
+                            {'sub': subreddit.display_name, 'title': submission.title, 'text': submission.selftext,
+                             'id': submission.id})
                         counter += 1
         else:
             print('gathering text from reddit, comments')
@@ -108,7 +143,7 @@ class StoryGetter:
         print(data)
         self.stories = data
 
-    def parse(self, bad_word, text):
+    def parse(self, bad_word, text, config):
         text = text.upper()
         check = True
         while check:
@@ -133,8 +168,8 @@ class StoryGetter:
             story_text = story['text']
             story_id = story['id']
             for bad_word in word_dict.keys():
-                title = self.parse(bad_word, story_title)
-                text = self.parse(bad_word, story_text)
+                title = self.parse(bad_word, story_title, config)
+                text = self.parse(bad_word, story_text, config)
                 story_title = title
                 story_text = text
             edited.append({'sub': story['sub'], 'title': story_title, 'text': story_text, 'id': story_id})
@@ -209,25 +244,25 @@ class StoryGetter:
                                 self.stories[c]['text'].insert(c2 + 1, last)
                                 break
         print(self.stories)
-                    #while breaker or line[ind] != ' ':
-                    #    if line[ind] == '.' or line[ind] == '?' or line[ind] == '!':
-                    #        no_add = True
-                    #        break
-                    #    if ind < len(line):
-                    #        ind += 1
-                    #    if ind == len(line) - 1:
-                    #        break
-                    #if breaker:
-                    #    break
-                    # add to sentence flags
-                    #if no_add is False:
-                    #    self.sentence_break_flags[c][c2] = True
-                    #    first = line[:ind] + '.'
-                    #    last = line[ind:]
-                    #    self.stories[c]['text'][c2] = first
-                    #    self.stories[c]['text'].insert(c2 + 1, last)
-                #else:
-                #self.sentence_break_flags[c][c2] = False
+        #while breaker or line[ind] != ' ':
+        #    if line[ind] == '.' or line[ind] == '?' or line[ind] == '!':
+        #        no_add = True
+        #        break
+        #    if ind < len(line):
+        #        ind += 1
+        #    if ind == len(line) - 1:
+        #        break
+        #if breaker:
+        #    break
+        # add to sentence flags
+        #if no_add is False:
+        #    self.sentence_break_flags[c][c2] = True
+        #    first = line[:ind] + '.'
+        #    last = line[ind:]
+        #    self.stories[c]['text'][c2] = first
+        #    self.stories[c]['text'].insert(c2 + 1, last)
+        #else:
+        #self.sentence_break_flags[c][c2] = False
 
     def bad_char_removal(self):
         # * error
@@ -270,22 +305,25 @@ class StoryGetter:
             text_list = story['text']
             print(f'text list len: {len(text_list)}')
             if ai_voice_clone:
-                AudioSegment.from_wav(f'data/audio/title_{story["sub"]}{c}.wav').export(f'data/audio/title_{story["sub"]}{c}.mp3', format="mp3")
+                AudioSegment.from_wav(f'data/audio/title_{story["sub"]}{c}.wav').export(
+                    f'data/audio/title_{story["sub"]}{c}.mp3', format="mp3")
                 AudioSegment.from_wav(f'data/audio/story_card_{c}.wav').export(
                     f'data/audio/story_card_{c}.mp3', format="mp3")
             sub = story['sub']
             for c2, line in enumerate(text_list):
                 if ai_voice_clone:
-                    AudioSegment.from_wav(f'data/audio/text_{sub}{c}_{c2}.wav').export(f'data/audio/text_{sub}{c}_{c2}.mp3', format="mp3")
+                    AudioSegment.from_wav(f'data/audio/text_{sub}{c}_{c2}.wav').export(
+                        f'data/audio/text_{sub}{c}_{c2}.mp3', format="mp3")
                 audio_path = f'{home_path}/data/audio/text_{sub}{c}_{c2}.mp3'
                 audio = AudioSegment.from_file(audio_path)
                 audio_duration += audio.duration_seconds
         in_mins = (audio_duration + (len(self.stories) * 12)) / 60
         print(f'Total Source Video length needed{in_mins}')
 
-    def title_clip_gen(self, sub, c, title, grab, vertical):
+    def title_clip_gen(self, sub, c, title, grab, vertical, config):
         if vertical:
-            split_card = TextClip(txt=f'Story {c + 1}', fontsize=config.text_size, color=config.text_color,
+            split_card = TextClip(txt=f'{config.story_delim}{c + 1}', fontsize=config.text_size,
+                                  color=config.text_color,
                                   method='caption',
                                   stroke_color=config.stroke_color, align=config.align, font=config.font,
                                   size=config.vertical_resolution, stroke_width=config.stroke_size).set_duration(2)
@@ -299,7 +337,8 @@ class StoryGetter:
                 title_duration)
 
         else:
-            split_card = TextClip(txt=f'Story {c + 1}', fontsize=config.text_size, color=config.text_color,
+            split_card = TextClip(txt=f'{config.story_delim}{c + 1}', fontsize=config.text_size,
+                                  color=config.text_color,
                                   method='caption',
                                   stroke_color=config.stroke_color, align=config.align, font=config.font,
                                   size=config.resolution, stroke_width=config.stroke_size).set_duration(2)
@@ -339,13 +378,15 @@ class StoryGetter:
                     first = False
                 else:
                     if self.vertical:
-                        split_card = TextClip(txt=f'Story {c + 1}', fontsize=config.text_size, color=config.text_color,
+                        split_card = TextClip(txt=f'{config.story_delim}{c + 1}', fontsize=config.text_size,
+                                              color=config.text_color,
                                               method='caption',
                                               stroke_color=config.stroke_color, align=config.align, font=config.font,
                                               size=config.vertical_resolution,
                                               stroke_width=config.stroke_size).set_duration(2)
                     else:
-                        split_card = TextClip(txt=f'Story {c + 1}', fontsize=config.text_size, color=config.text_color,
+                        split_card = TextClip(txt=f'{config.story_delim}{c + 1}', fontsize=config.text_size,
+                                              color=config.text_color,
                                               method='caption',
                                               stroke_color=config.stroke_color, align=config.align, font=config.font,
                                               size=config.resolution, stroke_width=config.stroke_size).set_duration(2)
@@ -359,9 +400,12 @@ class StoryGetter:
                 audio = AudioSegment.from_file(audio_path)
                 audio_duration = audio.duration_seconds
                 seg_duration.append(audio_duration)
-                if self.sentence_break_flags[c][c2]:
-                    line = line[:-1]
-                    #knock . off end of line
+                if not self.sentence_break_flags:
+                    pass
+                else:
+                    if self.sentence_break_flags[c][c2]:
+                        line = line[:-1]
+                        #knock . off end of line
                 # add text and audio together
                 if self.vertical:
                     txt_clip = TextClip(txt=line, fontsize=config.text_size, color=config.text_color, method='caption',
@@ -404,6 +448,7 @@ class StoryGetter:
         except:
             exit(1)
         os.system('del *')
+
 
 def save_story(grab, sub_id, story_target):
     story_obj = StoryGetter(grab=grab, sub_id=sub_id, story_target=story_target)
@@ -451,8 +496,10 @@ def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comm
 
 
 if __name__ == '__main__':
-    #vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/final_vid.mp4', sub_id=None, story_target=True, vertical=False, comment_target=False, non_api=None)
-    vid_auto(vid_path='input_vid/big_test.mp4', grab='story', vid_save_path='output/vertical_vid_test.mp4', sub_id=None, story_target=False, vertical=True, comment_target=False, non_api='data/saved_stories/27_06_24_tifu.json')
-    #save_story(grab='story', sub_id=None, story_target=True)
+    #vid_auto(vid_path='input_vid/big_test.mp4', grab='comment', vid_save_path='output/final_comment.mp4', sub_id='1dra11o', story_target=False, vertical=False, comment_target=False, non_api=None)
+    vid_auto(vid_path='input_vid/2.mp4', grab='comment', vid_save_path='output/comment_test.mp4', sub_id=None,
+             story_target=False, vertical=False, comment_target=False,
+             non_api='data/saved_stories/29_06_24_1dra11o.json')
+    #save_story(grab='comment', sub_id='1dra11o', story_target=False)
     #text_speech_handler.tts_tortoise_setup()
     # 'C:\Users\derip\PycharmProjects\reddit_vid_auto\data\saved_stories\saved_test.json'
