@@ -283,7 +283,7 @@ class StoryGetter:
                     f'data/audio/title_{story["sub"]}{c}.mp3', format="mp3")
                 AudioSegment.from_wav(f'data/audio/story_card_{c}.wav').export(
                     f'data/audio/story_card_{c}.mp3', format="mp3")
-            audio = AudioSegment.from_file(f"{home_path}/data/audio/title_{sub}{c}.mp3")
+            audio = AudioSegment.from_file(f"{home_path}/data/audio/title_{story['sub']}{c}.mp3")
             audio_card = AudioSegment.from_file(f"{home_path}/data/audio/story_card_{c}.mp3")
             audio_duration += audio.duration_seconds
             audio_duration += audio_card.duration_seconds
@@ -475,8 +475,7 @@ def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comm
 
 if __name__ == '__main__':
     #vid_auto(vid_path='input_vid/big_test.mp4', grab='comment', vid_save_path='output/final_comment.mp4', sub_id='1dra11o', story_target=False, vertical=False, comment_target=False, non_api=None)
-    #vid_auto(vid_path='input_videos/2.mp4', grab='story', vid_save_path='output/only_test.mp4', sub_id=None,
-    #         story_target=True, vertical=False, comment_target=False, non_api=None)
-    save_story(grab='story', sub_id='1drvnft', story_target=True)
+    vid_auto(vid_path='input_videos/big_test.mp4', grab='story', vid_save_path='output/to_post.mp4', sub_id=None, non_api='data/saved_stories/02_07_24_relationship_advice.json', story_target=True, vertical=False, comment_target=False)
+    #save_story(grab='story', sub_id='1drvnft', story_target=True)
     #text_speech_handler.tts_tortoise_setup()
     # 'C:\Users\derip\PycharmProjects\reddit_vid_auto\data\saved_stories\saved_test.json'
