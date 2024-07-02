@@ -4,6 +4,7 @@ import json
 
 config = base_config.setup()
 
+
 def save_story(grab, sub_id, story_target):
     import main
     main.save_story(grab, sub_id, story_target)
@@ -19,15 +20,23 @@ def config_edit(client_id, client_secret, user_agent, number_of_posts, sub_reddi
     data["client_secret"] = client_secret
     data["user_agent"] = user_agent
 
-    # story vars auto load
+    # story vars autoload
     data["number_of_posts"] = number_of_posts
-    data["sub_reddits"] = sub_reddits
+    # sub reddits to list
+    sub = sub_reddits[:-1]
+    sub = sub[1:]
+    sub = sub.split(',')
+    data["sub_reddits"] = sub
 
     # comment vars
     data["number_of_comments"] = number_of_comments
     data["story_delim_audio"] = story_delim_audio
     data["story_delim"] = story_delim
-    data["target_story"] = target_story
+    # target story to list
+    targ = target_story[:-1]
+    targ = targ[1:]
+    targ = targ.split(',')
+    data["target_story"] = targ
 
     # vid vars
     data["start_delay"] = start_delay
@@ -79,7 +88,7 @@ run_save_story = gr.Interface(
     fn=save_story,
     inputs=[
         gr.Dropdown(["story", "comment"], label="Story type"),
-        gr.Textbox(label="sub ID"),
+        gr.Textbox(label="sub ID", value=None),
         gr.Checkbox(label="target story", info="uses story targets from config, if checked sub id must be blank")
     ],
     outputs=["text"],
@@ -110,7 +119,7 @@ run_config_edit = gr.Interface(
         gr.Textbox(label="stroke_color", value=config.stroke_color),
         gr.Textbox(label="stroke_size", value=config.stroke_size),
         gr.Textbox(label="align", value=config.align),
-        gr.Dropdown(["tts", "gtts", "pytts"], label="TTS to use")
+        gr.Dropdown(["tts", "gtts", "pytts"], label="TTS to use", value=config.tts_to_use)
     ],
     outputs=["text"],
     allow_flagging="never",

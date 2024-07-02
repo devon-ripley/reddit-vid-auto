@@ -9,21 +9,21 @@ class Config:
 
         # story vars auto load
         self.number_of_posts = 1
-        self.sub_reddits = ['relationship_advice']
+        self.sub_reddits = ["relationship_advice"]
 
         # comment vars
         self.number_of_comments = 15
         self.story_delim_audio = ''
         self.story_delim = '#'
-        self.target_story = ['1dnt7ar', '1dnu3y3', '1dnkv2i']
+        self.target_story = ["1dnt7ar", "1dnu3y3", "1dnkv2i"]
 
         # vid vars
         self.start_delay = 10
         self.fps = 30
-        self.resolution = (1920, 1080)
-        self.resolution_back = (1920, 1080)
-        self.vertical_resolution = (608, 1080)
-        self.vertical_resolution_back = (608, 1080)
+        self.resolution = [1920, 1080]
+        self.resolution_back = [1920, 1080]
+        self.vertical_resolution = [608, 1080]
+        self.vertical_resolution_back = [608, 1080]
         self.font = 'Arial-Black'
         # Trebuchet-MS-Bold, Segoe-UI-Semibold 'to wide' , Arial-black is great, a little sharp
         self.text_size = 70
@@ -47,28 +47,28 @@ def setup():
         config.user_agent = data["user_agent"]
 
         # story vars autoload
-        config.number_of_posts = data["number_of_posts"]
+        config.number_of_posts = int(data["number_of_posts"])
         config.sub_reddits = data["sub_reddits"]
 
         # comment vars
-        config.number_of_comments = data["number_of_comments"]
+        config.number_of_comments = int(data["number_of_comments"])
         config.story_delim_audio = data["story_delim_audio"]
         config.story_delim = data["story_delim"]
         config.target_story = data["target_story"]
 
         # vid vars
-        config.start_delay = data["start_delay"]
-        config.fps = data["fps"]
+        config.start_delay = int(data["start_delay"])
+        config.fps = int(data["fps"])
         config.resolution = data["resolution"]
         config.resolution_back = data["resolution_back"]
         config.vertical_resolution = data["vertical_resolution"]
         config.vertical_resolution_back = data["vertical_resolution_back"]
         config.font = data["font"]
         # Trebuchet-MS-Bold, Segoe-UI-Semibold 'to wide' , Arial-black is great, a little sharp
-        config.text_size = data["text_size"]
+        config.text_size = int(data["text_size"])
         config.text_color = data["text_color"]
         config.stroke_color = data["stroke_color"]
-        config.stroke_size = data["stroke_size"]
+        config.stroke_size = float(data["stroke_size"])
         config.align = data["align"]
         config.tts_to_use = data["tts_to_use"]
 
@@ -80,7 +80,7 @@ def setup():
         data["client_secret"] = config.client_secret
         data["user_agent"] = config.user_agent
 
-        # story vars auto load
+        # story vars autoload
         data["number_of_posts"] = config.number_of_posts
         data["sub_reddits"] = config.sub_reddits
 

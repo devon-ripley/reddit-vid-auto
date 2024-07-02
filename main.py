@@ -1,4 +1,5 @@
-# TODO: target comment, add logging lmao, auto config.json setup, thumbnail creation on side?
+# TODO: target comment, add logging lmao, auto config.json setup, thumbnail creation on side?, gui config edit list
+#  error
 
 import datetime
 import re
@@ -18,6 +19,7 @@ home_path = pathlib.Path().resolve()
 
 # load config
 config = base_config.setup()
+
 
 class StoryGetter:
     def __init__(self, grab='story', vid_path='test.mp4', vid_save_path='untitled.mp4', sub_id=None, story_target=False,
@@ -58,11 +60,12 @@ class StoryGetter:
                 subreddit = submission.subreddit
                 self.stories.append(
                     {'sub': subreddit.display_name, 'title': submission.title, 'text': submission.selftext,
-                     'id': submission.id})
+                     'id': sub_id})
             return
         if self.grab == 'story':
             print('gathering text from reddit, story')
             for subreddit in config.sub_reddits:
+                print(subreddit)
                 counter = 0
                 for submission in reddit.subreddit(subreddit).hot(limit=10):
                     if counter == config.number_of_posts:
@@ -71,7 +74,7 @@ class StoryGetter:
                         continue
                     else:
                         self.stories.append(
-                            {'sub': subreddit.display_name, 'title': submission.title, 'text': submission.selftext,
+                            {'sub': subreddit, 'title': submission.title, 'text': submission.selftext,
                              'id': submission.id})
                         counter += 1
         else:
@@ -81,7 +84,7 @@ class StoryGetter:
             for top_level_comment in submission.comments:
                 if counter >= config.number_of_comments:
                     break
-                #if top_level_comment.stickied:
+                # if top_level_comment.stickied:
                 #    continue
                 if isinstance(top_level_comment, MoreComments):
                     continue
@@ -280,6 +283,10 @@ class StoryGetter:
                     f'data/audio/title_{story["sub"]}{c}.mp3', format="mp3")
                 AudioSegment.from_wav(f'data/audio/story_card_{c}.wav').export(
                     f'data/audio/story_card_{c}.mp3', format="mp3")
+            audio = AudioSegment.from_file(f"{home_path}/data/audio/title_{sub}{c}.mp3")
+            audio_card = AudioSegment.from_file(f"{home_path}/data/audio/story_card_{c}.mp3")
+            audio_duration += audio.duration_seconds
+            audio_duration += audio_card.duration_seconds
             sub = story['sub']
             for c2, line in enumerate(text_list):
                 if ai_voice_clone:
@@ -288,7 +295,7 @@ class StoryGetter:
                 audio_path = f'{home_path}/data/audio/text_{sub}{c}_{c2}.mp3'
                 audio = AudioSegment.from_file(audio_path)
                 audio_duration += audio.duration_seconds
-        in_mins = (audio_duration + (len(self.stories) * 12)) / 60
+        in_mins = audio_duration / 60
         print(f'Total Source Video length needed{in_mins}')
 
     def title_clip_gen(self, sub, c, title, grab, vertical):
@@ -468,9 +475,8 @@ def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comm
 
 if __name__ == '__main__':
     #vid_auto(vid_path='input_vid/big_test.mp4', grab='comment', vid_save_path='output/final_comment.mp4', sub_id='1dra11o', story_target=False, vertical=False, comment_target=False, non_api=None)
-    vid_auto(vid_path='input_vid/2.mp4', grab='comment', vid_save_path='output/comment_test.mp4', sub_id=None,
-             story_target=False, vertical=False, comment_target=False,
-             non_api='data/saved_stories/29_06_24_1dra11o.json')
-    #save_story(grab='comment', sub_id='1dra11o', story_target=False)
+    #vid_auto(vid_path='input_videos/2.mp4', grab='story', vid_save_path='output/only_test.mp4', sub_id=None,
+    #         story_target=True, vertical=False, comment_target=False, non_api=None)
+    save_story(grab='story', sub_id='1drvnft', story_target=True)
     #text_speech_handler.tts_tortoise_setup()
     # 'C:\Users\derip\PycharmProjects\reddit_vid_auto\data\saved_stories\saved_test.json'
