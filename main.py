@@ -412,7 +412,7 @@ class StoryGetter:
                                                          height=config.vertical_resolution_back[1], x1=650)
         total_time = round(sum(total_duration)) + 1 + config.start_delay
         print(total_time)
-        back_clip = background_video.subclip(config.start_delay, total_time)
+        back_clip = background_video.subclip(config.start_delay, total_time+10)
         final_txt_video = concatenate_videoclips(main_clip_list, method="compose")
         cores = os.cpu_count() - 1
         final_vid = CompositeVideoClip([back_clip, final_txt_video])
@@ -475,7 +475,7 @@ def vid_auto(grab, vid_path, vid_save_path, sub_id, story_target, vertical, comm
 
 if __name__ == '__main__':
     #vid_auto(vid_path='input_vid/big_test.mp4', grab='comment', vid_save_path='output/final_comment.mp4', sub_id='1dra11o', story_target=False, vertical=False, comment_target=False, non_api=None)
-    vid_auto(vid_path='input_videos/big_test.mp4', grab='story', vid_save_path='output/to_post.mp4', sub_id=None, non_api='data/saved_stories/02_07_24_relationship_advice.json', story_target=True, vertical=False, comment_target=False)
-    #save_story(grab='story', sub_id='1drvnft', story_target=True)
+    #vid_auto(vid_path='input_videos/big_test.mp4', grab='story', vid_save_path='output/to_post.mp4', sub_id=None, non_api='data/saved_stories/02_07_24_relationship_advice.json', story_target=True, vertical=False, comment_target=False)
+    save_story(grab='comments', sub_id='1dm430a', story_target=False)
     #text_speech_handler.tts_tortoise_setup()
     # 'C:\Users\derip\PycharmProjects\reddit_vid_auto\data\saved_stories\saved_test.json'
